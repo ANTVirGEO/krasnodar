@@ -1,5 +1,6 @@
 package com.company;
 
+import java.io.InterruptedIOException;
 import java.sql.*;
 
 class DB {
@@ -59,11 +60,17 @@ class DB {
                     ps.executeBatch();
                     System.out.println("Inserted " + i + " rows, still not end");
                 }
+                if  ( Thread.interrupted() ) {
+                        throw new InterruptedIOException("Thread interrupted during socket read");
+                    }
+
             }
             ps.executeBatch();
             System.out.println("Totally inserted " + N + " rows. Good job!");
         } catch (SQLException e) {
             System.out.println("Error while erasing/fulfilling table in DB");
+            e.printStackTrace();
+        } catch (InterruptedIOException e) {
             e.printStackTrace();
         }
     }
@@ -74,7 +81,7 @@ class DB {
         System.out.println("SELECTing from table " + table);
         try {
             rs = stmt.executeQuery(query);
-            System.out.println("set Field bean");
+            System.out.println("set Field POJO");
             while (rs.next()){
                 field.setField(rs.getLong("FIELD"));
             }
