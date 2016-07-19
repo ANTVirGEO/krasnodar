@@ -31,7 +31,6 @@ public class Main {
             // to cancel an individual task
             allBLogic.working = false;
         }
-        System.out.println(allBLogic.working);
         while (allBLogic.working) {
             System.out.print("");
         }
