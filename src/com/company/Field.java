@@ -13,10 +13,7 @@ class Field {
         return field;
     }
 
-    void setField(Long field) {
-        if (Number.class.isAssignableFrom(field.getClass()))
-            this.field.add(field);
-        else
-            System.out.println("Some wrong number got from DB = " + field);
+    void addField(Long field) {
+        this.field.add(field);
     }
 }

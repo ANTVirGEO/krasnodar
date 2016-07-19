@@ -1,16 +1,15 @@
 package com.company;
 
-import java.io.InterruptedIOException;
 import java.sql.*;
 
 class DB {
 
 
-    private static final String mysql_db_url = "jdbc:mysql://localhost/TEST";       // url to connect, in this case is local but you can connect to an ip
-    private static final String mysql_db_user = "root";                             // DB user name MYSQL
-    private static final String mysql_pass = "vahvah123";                           //DB password
-    private static final String table = "test";                                     //DB password
-    private static final int pressureValue = 10000;                                 //for case when DB is overloaded, rows to insert by 1 batch
+    private static final String mysql_db_url = "jdbc:mysql://localhost/TEST?useSSL=false";       // url to connect, in this case is local but you can connect to an ip
+    private static final String mysql_db_user = "root";                                          // DB user name MYSQL
+    private static final String mysql_pass = "vahvah123";                                        //DB password
+    private static final String table = "test";                                                  //DB table
+    private static final int pressureValue = 1000;                                               //for case when DB is overloaded, rows to insert by 1 batch
     private static final String query = "select * from " + table;
 
     private static Connection con;
@@ -53,24 +52,22 @@ class DB {
                 N = 1;
             }
             PreparedStatement ps = con.prepareStatement("INSERT INTO " + table + " VALUES (?)");
+            int k = 1;
             for (int i = 1; i <= N; i++) {
+                k++;
                 ps.setInt(1, i);
                 ps.addBatch();
                 if (i % pressureValue == 0) {
+                    System.out.println(allBLogic.working);
                     ps.executeBatch();
                     System.out.println("Inserted " + i + " rows, still not end");
+                    if (!allBLogic.working) {break;}
                 }
-                if  ( Thread.interrupted() ) {
-                        throw new InterruptedIOException("Thread interrupted during socket read");
-                    }
-
             }
             ps.executeBatch();
-            System.out.println("Totally inserted " + N + " rows. Good job!");
+            System.out.println("Totally inserted " + k + " rows. Good job!");
         } catch (SQLException e) {
             System.out.println("Error while erasing/fulfilling table in DB");
-            e.printStackTrace();
-        } catch (InterruptedIOException e) {
             e.printStackTrace();
         }
     }
@@ -83,13 +80,13 @@ class DB {
             rs = stmt.executeQuery(query);
             System.out.println("set Field POJO");
             while (rs.next()){
-                field.setField(rs.getLong("FIELD"));
+                field.addField(rs.getLong("FIELD"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         if (field.getField().isEmpty())             //for "somehow' emergency
-            field.setField(1L);
+            field.addField(1L);
         return field;
     }
 /*

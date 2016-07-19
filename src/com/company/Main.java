@@ -8,11 +8,10 @@ import java.util.concurrent.Future;
 public class Main {
     /**
      * All xml/xsl operation done without importing libraries - for millions and billions of rows it can be memory-addictive. Better using some JAXP for this, SOX mb
-     * The only library imported - jdbc driver
-     * All logic run in new thread, while in parent we checking time
-     * The only way to stop child thread is - System.exit(1) - all others methods don't stop it
+     * The only library imported - jdbc driver, no maven here for test project
+     * All logic run in new thread, while in parent we checking time. Here Thread stop is working while I/O, cause of flag checking while batch to DB.
      */
-    private static final int minutesToStopCalculation = 1;
+    private static final int minutesToStopCalculation = 5;
     private static final long maximumOfN = 1000000;
 
     public static void main(String[] args) {
@@ -30,10 +29,12 @@ public class Main {
             while (System.currentTimeMillis() < end) {}
             System.out.println("TOO MUCH TIME!\nProgram will close now, please wait");
             // to cancel an individual task
-            future.cancel(true);
-            service.shutdown();
-            service.shutdownNow();
-            //System.exit(0);
+            allBLogic.working = false;
         }
+        System.out.println(allBLogic.working);
+        while (allBLogic.working) {
+            System.out.print("");
+        }
+        service.shutdown();
     }
 }

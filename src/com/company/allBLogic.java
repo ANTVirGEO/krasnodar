@@ -23,44 +23,37 @@ class allBLogic implements java.util.concurrent.Callable, Runnable {
 
 
     private static long N;
+    public static boolean working;
 
     allBLogic(long N) {
         allBLogic.N = N;
-        if (Thread.interrupted()) System.exit(1);
+        allBLogic.working = true;
     }
 
     @Override
     public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
-            // continue processing
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // good practice
-                Thread.currentThread().interrupt();
-                return;
-            }
+        while (working) {
+            //stage with asking N an erase/fulfill table
+            System.out.println("Number is = " + N);
+            DB db = new DB();
+            db.openConnection();
+            db.fulFill(N);
+            //stage with selecting in Field POJO and save to XML
+            System.out.println("___stage with selecting in Filed POJO and save to XML");
+            Field field = db.select();
+            System.out.println(field.getField());
+            db.closeConnection();
+            saveXML(field.getField());
+            //stage where 1.xml transform to 2.xml with XSLT
+            System.out.println("___stage with transform 1.xml with XSLT pattern to 2.xml");
+            createXSL();
+            saveWithXSLT();
+            //parsing 2.xml and sum
+            System.out.println("___stage with parse/sum 2.xml");
+            long sum = barSoomXML();
+            System.out.println("Sum of 2.xml attributes = " + sum);
+            working = false;
         }
-        //stage with asking N an erase/fulfill table
-        System.out.println("Number is = " + N);
-        DB db = new DB();
-        db.openConnection();
-        db.fulFill(N);
-        //stage with selecting in Field POJO and save to XML
-        System.out.println("___stage with selecting in Filed POJO and save to XML");
-        Field field = db.select();
-        System.out.println(field.getField());
-        db.closeConnection();
-        saveXML(field.getField());
-        //stage where 1.xml transform to 2.xml with XSLT
-        System.out.println("___stage with transform 1.xml with XSLT pattern to 2.xml");
-        createXSL();
-        saveWithXSLT();
-        //parsing 2.xml and sum
-        System.out.println("___stage with parse/sum 2.xml");
-        long sum = barSoomXML();
-        System.out.println("Sum of 2.xml attributes = " + sum);
-        System.exit(0);
     }
 
     @Override
