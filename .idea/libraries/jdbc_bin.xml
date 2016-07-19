@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jdbc.bin">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jdbc.bin.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
